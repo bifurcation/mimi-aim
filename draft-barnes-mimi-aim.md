@@ -19,12 +19,12 @@
 # Change the file extension to match the format (.xml for XML, etc...)
 #
 ###
-title: "TODO - Your title"
-abbrev: "TODO - Abbreviation"
+title: "ActivityPub for Interoperable Messaging"
+abbrev: "AIM"
 category: info
 
-docname: draft-todo-yourname-protocol-latest
-submissiontype: IETF  # also: "independent", "IAB", or "IRTF"
+docname: draft-barnes-mimi-aim-latest
+submissiontype: IETF
 number:
 date:
 consensus: true
