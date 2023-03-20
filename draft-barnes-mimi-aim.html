@@ -1639,7 +1639,7 @@ as shown in <a href="#fig-webfinger" class="auto internal xref">Figure 5</a>.  T
   "subject": "acct:alice@example.com",
   "links": [
     {
-      "rel": "http://webfinger.net/rel/profile-page",
+      "rel": "https://webfinger.net/rel/profile-page",
       "type": "text/html",
       "href": "https://example.com/@alice"
     },
@@ -1747,19 +1747,19 @@ activity to their inboxes.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "urn:ietf:ns:mimi",
+    "urn:ietf:ns:mimi"
   ],
   "summary": "Alice created a channel",
   "type": "Create",
-  "id": "http://example.com/activities/1",
-  "actor": "http://example.com/user/alice",
+  "id": "https://example.com/activities/1",
+  "actor": "https://example.com/user/alice",
   "object": {
     "type": "Service",
-    "id": "http://example.com/channels/e4f70622",
+    "id": "https://example.com/channels/e4f70622",
     "name": "MIMI discussion group"
   },
   "mimi:welcome": "&lt;base64-encoded Welcome&gt;",
-  "to": "http://john.example.org"
+  "to": "https://john.example.org"
 }
 </pre>
 </div>
@@ -1800,10 +1800,10 @@ content to be delivered to the channel.<a href="#section-5.2.2-1" class="pilcrow
     "attributedTo": "https://example.net/~mallory",
     "content": "&lt;base64 encoded MLS PrivateMessage&gt;",
     "published": "2015-02-10T15:04:55Z",
-    "to": ["http://example.com/channels/e4f70622/followers"]
+    "to": ["https://example.com/channels/e4f70622/followers"]
   },
   "published": "2015-02-10T15:04:55Z",
-  "to": ["http://example.com/channels/e4f70622/followers"]
+  "to": ["https://example.com/channels/e4f70622/followers"]
 }
 </pre>
 </div>
@@ -1840,12 +1840,12 @@ epoch for the channel, and reject the activity if this is not the case.<a href="
   "@context": "https://www.w3.org/ns/activitystreams",
   "type": "Add",
   "id": "https://example.com/user/alice/98485",
-  "actor": "http://example.com/user/alice",
-  "object": "http://example.net/user/bob",
-  "target": "http://example.com/channels/e4f70622/followers",
+  "actor": "https://example.com/user/alice",
+  "object": "https://example.net/user/bob",
+  "target": "https://example.com/channels/e4f70622/followers",
   "commit": "&lt;base64-encoded MLS Commit&gt;",
   "welcome": "&lt;base64-encoded MLS Welcome&gt;",
-  "to": ["http://example.com/channels/e4f70622/followers"]
+  "to": ["https://example.com/channels/e4f70622/followers"]
 }
 </pre>
 </div>
@@ -1861,13 +1861,13 @@ an Update activity to the channel Actor's inbox.<a href="#section-5.2.3-4" class
 {
   "@context": "https://www.w3.org/ns/activitystreams",
   "type": "Update",
-  "actor": "http://example.com/user/alice",
-  "object": "object": {
+  "actor": "https://example.com/user/alice",
+  "object": {
     "type": "Service",
-    "id": "http://example.com/channels/e4f70622",
+    "id": "https://example.com/channels/e4f70622",
     "name": "MIMI discussion group (now with more ActivityPub!)"
   },
-  "to": "http://example.com/channels/e4f70622/inbox"
+  "to": "https://example.com/channels/e4f70622/inbox"
 }
 </pre>
 </div>
