@@ -95,19 +95,6 @@ ActivityPub might need modification or extension to support MIMI use cases.
 
 # MIMI Requirements
 
-Summary:
-* S2S federation, with the internals of each messaging system opaque
-* Components of the system <— ActivityPub covers transport, identity
-* Use cases:
-    * 1:1 messaging
-    * “Group DMs” ~ immutable, singular group <— works pretty naturally
-    * Channels ~ variable membership, more reified <— not a seamless fit
-* Ownership models?
-    * Single-owner, permanent
-    * Single-owner, transferable <— target this model
-    * Multi-owner, synchronized
-    * Mutli-owner, YOLO. <— or this model
-
 ## Components
 
 An overall solution for interoperability between messaging services naturally
