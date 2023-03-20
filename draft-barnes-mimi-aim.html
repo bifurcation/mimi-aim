@@ -1,0 +1,2083 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>ActivityPub for Interoperable Messaging (AIM)</title>
+<meta content="Richard L. Barnes" name="author">
+<meta content="
+       The MIMI working group is chartered to define tools that messaging providers can
+use to interoperate with one another.  The W3C ActivityPub protocol is already
+widely used for several use cases that resemble the MIMI use case.  This
+document examines whether ActivityPub might be a good baseline for providing the
+sort of interoperability that MIMI intends to achieve. 
+    " name="description">
+<meta content="xml2rfc 3.17.0" name="generator">
+<meta content="MIMI" name="keyword">
+<meta content="messaging" name="keyword">
+<meta content="ActivityPub" name="keyword">
+<meta content="end-to-end encryption" name="keyword">
+<meta content="draft-barnes-mimi-aim-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.17.0
+    Python 3.10.10
+    appdirs 1.4.4
+    ConfigArgParse 1.5.3
+    google-i18n-address 2.5.2
+    html5lib 1.1
+    intervaltree 3.1.0
+    Jinja2 3.1.2
+    lxml 4.9.2
+    MarkupSafe 2.1.1
+    pycountry 22.3.5
+    PyYAML 6.0
+    requests 2.28.1
+    setuptools 65.6.0
+    six 1.16.0
+    wcwidth 0.2.6
+-->
+<link href="draft-barnes-mimi-aim.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Cabin Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Cabin Condensed SemiBold'), local('CabinCondensed-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/cabincondensed-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Cabin Condensed", sans-serif;
+  font-weight: 600;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1#title {
+  font-size: 32px;
+  line-height: 40px;
+  clear: both;
+}
+h1#title, h1#rfcnum {
+  margin: 1.5em 0 0.2em;
+}
+h1#rfcnum + h1#title {
+  margin: 0.2em 0;
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+}
+#abstract+p code, #abstract+p samp, #abstract+p tt {
+  font-size: 16px;
+  line-height: 0;
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+/* font-family isn't space-separated, but =~ will have to do */
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: var(--highlight-color);
+  border: 1px solid var(--line-color);
+  border-radius: 3px;
+  padding: 0.5em 1em 0;
+  margin-bottom: 0.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+  width: auto;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  border: none;
+  /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+     support flexbox yet.
+  */
+  display: table;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+}
+:is(ol, ul) :is(ol, ul) {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  line-height: 1;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+}
+dl.olPercent {
+  --indent: 5ch;
+}
+dl > dt {
+  float: left;
+  margin-right: 2ch;
+  min-width: 8ch;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+dl > dd {
+  margin-bottom: .8em;
+  margin-left: var(--indent) !important; /* stupid element overrides */
+  min-height: 2ex;
+}
+dl.olPercent > dt {
+  min-width: calc(var(--indent) - 2ch);
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:first-child, .break:first-child + *) {
+  margin-top: 0;
+}
+:is(dl.compact, .dlCompact) > dd > :is(:last-child) {
+  margin-bottom: 0;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a, a[href].selfRef:hover {
+  text-decoration: none;
+}
+a[href] {
+  color: var(--link-color);
+}
+a[href].selfRef, .iref + a[href].internal {
+  color: var(--text-color);
+}
+a[href]:hover {
+  text-decoration: underline;
+}
+a[href].selfRef:hover {
+  background-color: var(--highlight-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) p {
+    margin: -2px 0;
+    max-height: 0;
+    transition: max-height 2s ease, margin 0.5s ease 0.5s;
+    overflow: hidden;
+  }
+  :is(#status-of-memo, #copyright):hover p,
+  :is(#status-of-memo, #copyright) h2:target ~ p {
+    margin: 0.5em 0;
+    max-height: 500px;
+    overflow: auto;
+  }
+  pre, svg {
+    display: inline-block;
+    overflow-x: auto;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+table.right {
+  margin-left: auto;
+}
+table.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+table.left {
+  margin-right: auto;
+}
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+table caption {
+  margin: 0;
+  padding: 3px 0 3px 1em;
+}
+table p {
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+}
+a.pilcrow[href] { color: var(--pilcrow-weak); }
+a.pilcrow[href]:hover { text-decoration: none; }
+@media not print {
+  :hover > a.pilcrow {
+    opacity: 1;
+  }
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
+    background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+}
+#identifiers dt {
+  width: var(--identifier-width);
+  min-width: var(--identifier-width);
+  clear: left;
+  float: left;
+  text-align: right;
+}
+#identifiers dd {
+  margin: 0;
+  margin-left: calc(1em + var(--identifier-width)) !important;
+  min-width: 5em;
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+#toc nav ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#toc nav li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+#toc a.xref {
+  white-space: normal;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dt:target::before {
+  content: "⇒";
+  width: 15px;
+  margin: 0 10px 0 -25px;
+}
+.references dd {
+  margin-left: 8em !important;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses > section {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #authors-addresses > section > h2 {
+    column-span: all;
+  }
+  /* hack for break-inside: avoid-column */
+  #authors-addresses address {
+    display: inline-block;
+    break-inside: avoid-column;
+  }
+}
+
+.rfcEditorRemove p:first-of-type {
+  font-style: italic;
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+  }
+  #toc.active {
+      opacity: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 2px 0 2px 6px;
+    padding-right: 1em;
+    font-size: 18px;
+    line-height: 24px;
+    min-width: 190px;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 8px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    background-color: var(--background-color);
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+  #toc.active nav {
+    display: block;
+  }
+  /* Make the collapsed ToC header render white on gray also when it's a link */
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+  #toc a.toplink {
+    margin-top: 2px;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  #toc h2 {
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 2em;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  #toc nav > ul  {
+    margin-bottom: 2em;
+  }
+  #toc ul {
+    margin: 0 0 0 4px;
+    font-size: var(--small-font-size);
+  }
+  #toc ul :is(p, li) {
+    margin: 2px 0;
+    line-height: 22px;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Changes introduced to fix issues found during implementation */
+
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin: 8px 0.5em 0;
+}
+
+/* Provide styling for table cell text alignment */
+table .text-left {
+  text-align: left;
+}
+table .text-center {
+  text-align: center;
+}
+table .text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 20em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  dd {
+    page-break-before: avoid;
+  }
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg :is([stroke="black"], [stroke^="#000"]) {
+  stroke: var(--text-color);
+}
+svg :is([stroke="white"], [stroke^="#fff"]) {
+  stroke: var(--background-color);
+}
+svg :is([fill="black"], [fill^="#000"], :not([fill])) {
+  fill: var(--text-color);
+}
+svg :is([fill="white"], [fill^="#fff"]) {
+  fill: var(--background-color);
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">AIM</td>
+<td class="right">March 2023</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Barnes</td>
+<td class="center">Expires 21 September 2023</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">More Instant Messaging Interoperability</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-barnes-mimi-aim-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2023-03-20" class="published">20 March 2023</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2023-09-21">21 September 2023</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">R. L. Barnes</div>
+<div class="org">Cisco</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">ActivityPub for Interoperable Messaging (AIM)</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">The MIMI working group is chartered to define tools that messaging providers can
+use to interoperate with one another.  The W3C ActivityPub protocol is already
+widely used for several use cases that resemble the MIMI use case.  This
+document examines whether ActivityPub might be a good baseline for providing the
+sort of interoperability that MIMI intends to achieve.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        The latest revision of this draft can be found at <span><a href="https://bifurcation.github.io/mimi-aim/draft-barnes-mimi-aim.html">https://bifurcation.github.io/mimi-aim/draft-barnes-mimi-aim.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-barnes-mimi-aim/">https://datatracker.ietf.org/doc/draft-barnes-mimi-aim/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        More Instant Messaging Interoperability Working Group mailing list (<span><a href="mailto:mimi@ietf.org">mailto:mimi@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/mimi/">https://mailarchive.ietf.org/arch/browse/mimi/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/mimi/">https://www.ietf.org/mailman/listinfo/mimi/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/bifurcation/mimi-aim">https://github.com/bifurcation/mimi-aim</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 21 September 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2023 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-mimi-requirements" class="internal xref">MIMI Requirements</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-components" class="internal xref">Components</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-service-to-service-interope" class="internal xref">Service-to-Service Interoperability</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-transport-use-cases" class="internal xref">Transport Use Cases</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-activitypub" class="internal xref">ActivityPub</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-actors-and-activities" class="internal xref">Actors and Activities</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-activity-delivery" class="internal xref">Activity Delivery</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-identity" class="internal xref">Identity</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-using-activitypub-for-mimi" class="internal xref">Using ActivityPub for MIMI</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-user-identity-and-metadata" class="internal xref">User Identity and Metadata</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-channels" class="internal xref">Channels</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.1">
+                    <p id="section-toc.1-1.5.2.2.2.1.1"><a href="#section-5.2.1" class="auto internal xref">5.2.1</a>.  <a href="#name-channel-creation" class="internal xref">Channel Creation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.2">
+                    <p id="section-toc.1-1.5.2.2.2.2.1"><a href="#section-5.2.2" class="auto internal xref">5.2.2</a>.  <a href="#name-message-delivery" class="internal xref">Message Delivery</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.3">
+                    <p id="section-toc.1-1.5.2.2.2.3.1"><a href="#section-5.2.3" class="auto internal xref">5.2.3</a>.  <a href="#name-membership-and-metadata-man" class="internal xref">Membership and Metadata Management</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-group-dms" class="internal xref">Group DMs</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-end-to-end-security" class="internal xref">End-to-End Security</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-forward-secrecy" class="internal xref">Forward Secrecy</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-authentication-and-authoriz" class="internal xref">Authentication and Authorization</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">The MIMI working group is chartered to define tools that messaging providers can
+use to interoperate with one another.  Messaging is obviously not a new
+application; readers of <span><a href="#RFC561" class="internal xref">"Message Transmission Protocol"</a> [<a href="#RFC561" class="cite xref">RFC561</a>]</span> from 1975 will find
+familiar concepts such as "TO", "CC", and "BCC" fields.  It thus seems likely
+that some existing protocol will satisfy many of MIMI's requirements.  Basing
+MIMI on an existing widely deployed protocol can also facilitate deployment of
+the MIMI protocol, since the lessons from deployment of the predecessor protocol
+should mostly carry forward.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">This document considers the W3C <span><a href="#W3C.ActivityPub" class="internal xref">ActivityPub protocol</a> [<a href="#W3C.ActivityPub" class="cite xref">W3C.ActivityPub</a>]</span> as such
+candidate to be such a baseline for MIMI.  At a high, level, ActivityPub is a
+protocol for sharing "Activities" with various semantics among users homed to
+loosely-coupled servers.  ActivityPub was published as a W3C Recommendation in
+2018, and today supports several wide-scale services.  The largest and most
+prominent of these is the <span><a href="#Mastodon" class="internal xref">Mastodon microblogging platform</a> [<a href="#Mastodon" class="cite xref">Mastodon</a>]</span>, which as
+of this writing has around 10 million registered users, and an active userbase
+in the millions.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">The fact that Mastodon is based on ActivityPub is suggestive of how ActivityPub
+might be useful for MIMI.  On the one hand, while Mastodon is primarily used for
+distributing public messages, it also allows users to post private messages that
+are only delivered to specific recipients.  On the other hand, Mastodon's focus
+on wide distribution of public messages suggests that ActivityPub could support
+messaging among large numbers of recipients.  Mastodon also includes some
+extensions to ActiivityPub that could also be salient to MIMI, such as the use
+of <span><a href="#RFC7565" class="internal xref"><code>acct</code> URIs</a> [<a href="#RFC7565" class="cite xref">RFC7565</a>]</span> to identify users and the use of <span><a href="#RFC7033" class="internal xref">WebFinger</a> [<a href="#RFC7033" class="cite xref">RFC7033</a>]</span> to resolve these URIs
+to routable identifiers.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">In the remainder of this document, we review the MIMI requirements and the
+high-level architecture of ActivityPub.  We then sketch out approaches based on
+ActivityPub for realizing the use cases salient to MIMI, highlighting both areas
+where there is natural overlap between MIMI and ActivityPub and areas where
+ActivityPub might need modification or extension to support MIMI use cases.<a href="#section-1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="conventions-and-definitions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="mimi-requirements">
+<section id="section-3">
+      <h2 id="name-mimi-requirements">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-mimi-requirements" class="section-name selfRef">MIMI Requirements</a>
+      </h2>
+<p id="section-3-1">Summary:
+* S2S federation, with the internals of each messaging system opaque
+* Components of the system &lt;— ActivityPub covers transport, identity
+* Use cases:
+    * 1:1 messaging
+    * “Group DMs” ~ immutable, singular group &lt;— works pretty naturally
+    * Channels ~ variable membership, more reified &lt;— not a seamless fit
+* Ownership models?
+    * Single-owner, permanent
+    * Single-owner, transferable &lt;— target this model
+    * Multi-owner, synchronized
+    * Mutli-owner, YOLO. &lt;— or this model<a href="#section-3-1" class="pilcrow">¶</a></p>
+<div id="components">
+<section id="section-3.1">
+        <h3 id="name-components">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-components" class="section-name selfRef">Components</a>
+        </h3>
+<p id="section-3.1-1">An overall solution for interoperability between messaging services naturally
+breaks down into a few components, as illustrated in <a href="#fig-components" class="auto internal xref">Figure 1</a>:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-2.1">A <strong>Transport</strong> system that delivers messages between services, including
+enough information for the services to route the messages to the correct set
+of end clients.<a href="#section-3.1-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.1-2.2">An <strong>End-to-End (E2E) Security</strong> layer that protects message contents from
+inspection or tampering by the services involved in delivering them.<a href="#section-3.1-2.2" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.1-2.3">
+            <p id="section-3.1-2.3.1">An <strong>Identity</strong> system that provides:<a href="#section-3.1-2.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-2.3.2.1">A client addressing scheme by which the servers participating in the
+transport can identify which clients should receive a message.<a href="#section-3.1-2.3.2.1" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-3.1-2.3.2.2">A credential scheme that is used to authenticate clients to one another in
+the end-to-end security system.<a href="#section-3.1-2.3.2.2" class="pilcrow">¶</a>
+</li>
+            </ul>
+</li>
+          <li class="normal" id="section-3.1-2.4">Formats for messages carried within end-to-end protection that enable
+<strong>Messaging</strong> and <strong>Real-Time</strong> applications.<a href="#section-3.1-2.4" class="pilcrow">¶</a>
+</li>
+        </ul>
+<span id="name-components-of-mimi"></span><div id="fig-components">
+<figure id="figure-1">
+          <div id="section-3.1-3.1">
+            <div class="alignLeft art-svg artwork" id="section-3.1-3.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="144" width="368" viewBox="0 0 368 144" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+                <path d="M 8,64 L 8,96" fill="none" stroke="black"></path>
+                <path d="M 96,64 L 96,96" fill="none" stroke="black"></path>
+                <path d="M 128,80 L 128,112" fill="none" stroke="black"></path>
+                <path d="M 168,32 L 168,128" fill="none" stroke="black"></path>
+                <path d="M 264,32 L 264,64" fill="none" stroke="black"></path>
+                <path d="M 360,32 L 360,128" fill="none" stroke="black"></path>
+                <path d="M 168,32 L 360,32" fill="none" stroke="black"></path>
+                <path d="M 8,64 L 96,64" fill="none" stroke="black"></path>
+                <path d="M 168,64 L 360,64" fill="none" stroke="black"></path>
+                <path d="M 96,80 L 160,80" fill="none" stroke="black"></path>
+                <path d="M 8,96 L 96,96" fill="none" stroke="black"></path>
+                <path d="M 168,96 L 360,96" fill="none" stroke="black"></path>
+                <path d="M 128,112 L 160,112" fill="none" stroke="black"></path>
+                <path d="M 168,128 L 360,128" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="168,112 156,106.4 156,117.6" fill="black" transform="rotate(0,160,112)"></polygon>
+                <polygon class="arrowhead" points="168,80 156,74.4 156,85.6" fill="black" transform="rotate(0,160,80)"></polygon>
+                <g class="text">
+                  <text x="216" y="52">Messaging</text>
+                  <text x="312" y="52">Real-Time</text>
+                  <text x="52" y="84">Identity</text>
+                  <text x="224" y="84">E2E</text>
+                  <text x="276" y="84">Security</text>
+                  <text x="264" y="116">Transport</text>
+                </g>
+              </svg><a href="#section-3.1-3.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-components-of-mimi" class="selfRef">Components of MIMI</a>
+          </figcaption></figure>
+</div>
+<p id="section-3.1-4">In other words, the E2E security layer creates a demarcation between things that
+are visible to servers and things that are not.  The transport protocol defines
+the former, message formats the latter.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="service-to-service-interoperability">
+<section id="section-3.2">
+        <h3 id="name-service-to-service-interope">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-service-to-service-interope" class="section-name selfRef">Service-to-Service Interoperability</a>
+        </h3>
+<p id="section-3.2-1">MIMI is focused on interoperability between messaging <strong>services</strong>.  Unlike
+earlier messaging protocols like <span><a href="#RFC6120" class="internal xref">XMPP</a> [<a href="#RFC6120" class="cite xref">RFC6120</a>]</span>, which cover client-to-server
+interactions as well as server-to-server interactions, MIMI is focused primarily
+on the latter.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<span id="name-mimi-delivers-messages-betw"></span><div id="s2s">
+<figure id="figure-2">
+          <div id="section-3.2-2.1">
+            <div class="alignLeft art-svg artwork" id="section-3.2-2.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="128" width="496" viewBox="0 0 496 128" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+                <path d="M 48,64 L 80,64" fill="none" stroke="black"></path>
+                <path d="M 112,64 L 144,64" fill="none" stroke="black"></path>
+                <path d="M 192,64 L 224,64" fill="none" stroke="black"></path>
+                <path d="M 256,64 L 288,64" fill="none" stroke="black"></path>
+                <path d="M 336,64 L 368,64" fill="none" stroke="black"></path>
+                <path d="M 400,64 L 432,64" fill="none" stroke="black"></path>
+                <path d="M 80,96 L 128,96" fill="none" stroke="black"></path>
+                <path d="M 224,96 L 272,96" fill="none" stroke="black"></path>
+                <path d="M 368,96 L 416,96" fill="none" stroke="black"></path>
+                <path d="M 48,64 C 39.16936,64 32,71.16936 32,80" fill="none" stroke="black"></path>
+                <path d="M 80,64 C 88.83064,64 96,56.83064 96,48" fill="none" stroke="black"></path>
+                <path d="M 112,64 C 103.16936,64 96,56.83064 96,48" fill="none" stroke="black"></path>
+                <path d="M 144,64 C 152.83064,64 160,71.16936 160,80" fill="none" stroke="black"></path>
+                <path d="M 192,64 C 183.16936,64 176,71.16936 176,80" fill="none" stroke="black"></path>
+                <path d="M 224,64 C 232.83064,64 240,56.83064 240,48" fill="none" stroke="black"></path>
+                <path d="M 256,64 C 247.16936,64 240,56.83064 240,48" fill="none" stroke="black"></path>
+                <path d="M 288,64 C 296.83064,64 304,71.16936 304,80" fill="none" stroke="black"></path>
+                <path d="M 336,64 C 327.16936,64 320,71.16936 320,80" fill="none" stroke="black"></path>
+                <path d="M 368,64 C 376.83064,64 384,56.83064 384,48" fill="none" stroke="black"></path>
+                <path d="M 400,64 C 391.16936,64 384,56.83064 384,48" fill="none" stroke="black"></path>
+                <path d="M 432,64 C 440.83064,64 448,71.16936 448,80" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="424,96 412,90.4 412,101.6" fill="black" transform="rotate(0,416,96)"></polygon>
+                <polygon class="arrowhead" points="376,96 364,90.4 364,101.6" fill="black" transform="rotate(180,368,96)"></polygon>
+                <polygon class="arrowhead" points="280,96 268,90.4 268,101.6" fill="black" transform="rotate(0,272,96)"></polygon>
+                <polygon class="arrowhead" points="232,96 220,90.4 220,101.6" fill="black" transform="rotate(180,224,96)"></polygon>
+                <polygon class="arrowhead" points="136,96 124,90.4 124,101.6" fill="black" transform="rotate(0,128,96)"></polygon>
+                <polygon class="arrowhead" points="88,96 76,90.4 76,101.6" fill="black" transform="rotate(180,80,96)"></polygon>
+                <g class="text">
+                  <text x="92" y="36">Domain</text>
+                  <text x="128" y="36">A</text>
+                  <text x="196" y="36">MIMI</text>
+                  <text x="256" y="36">Transport</text>
+                  <text x="380" y="36">Domain</text>
+                  <text x="416" y="36">B</text>
+                  <text x="28" y="100">Client</text>
+                  <text x="64" y="100">A</text>
+                  <text x="168" y="100">Service</text>
+                  <text x="208" y="100">A</text>
+                  <text x="312" y="100">Service</text>
+                  <text x="352" y="100">B</text>
+                  <text x="452" y="100">Client</text>
+                  <text x="488" y="100">B</text>
+                </g>
+              </svg><a href="#section-3.2-2.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-mimi-delivers-messages-betw" class="selfRef">MIMI delivers messages between services</a>
+          </figcaption></figure>
+</div>
+<p id="section-3.2-3">The MIMI transport system and the routing functions of the identity system
+operate within the inter-service interaction.  The services are presumed to be
+able to deliver messages to connected clients based on information provided by
+the transport system.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.2-4">As the name implies, the E2E security system must be compatible across the
+various clients that comprise the endpoints of a messaging interaction.  This in
+turn requires that the authentication aspects of the identity layer and the
+message formats be understood by clients.  Since these components are not
+accessible to servers (due to E2E protections), they need to be handled locally
+on clients.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
+<p id="section-3.2-5">Here again, the E2E security layer creates a demarcation, between protocol
+features that are server-to-server and client-to-client scoped.  Note, however,
+that no part of the protocol covers client-to-server interactions.  These are
+the domain of the individual services.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="transport-use-cases">
+<section id="section-3.3">
+        <h3 id="name-transport-use-cases">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-transport-use-cases" class="section-name selfRef">Transport Use Cases</a>
+        </h3>
+<p id="section-3.3-1">The messaging applications among which MIMI is to provide interoperability
+typically support two types of interaction with complementary properties:<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.3-2.1">Group Direct Messages (DMs): The interaction has a static set of participants,
+and is "singular", in the sense that any direct message to exactly that set of
+participants is presumed to belong to the interaction.<a href="#section-3.3-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-3.3-2.2">Channels: An interaction with a dynamic set of participants.  Multiple
+channels can have the same set of participants, and participants can join and
+leave the channel.<a href="#section-3.3-2.2" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-3.3-3">(These concepts have various names in different messaging systems.  The naming
+here is not intended to indicate alignment with one system over another, but to
+choose some common terminology with appropriate connotations.)<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.3-4">Many systems also support one-to-one messaging, but this can be considered a
+special cases of Group DMs, in the sense that one-to-one conversations are
+typically singular interactions with have a static participant set.  It is also
+common for an interaction that appears to be 1:1 in a user interface to be
+realized with group messaging, for example to accommodate users' use of multiple
+devices.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
+<p id="section-3.3-5">One way to view the distinction between group DMs and channels is that in a
+channel-style interaction, the interaction is "reified", in the sense that it is
+an entity in the protocol that can be the subject of metadata, the object of
+actions, etc.  Group DMs, on the other hand, are defined only by their
+participant list.  Channels are like XMPP MUCs <span>[<a href="#RFC7702" class="cite xref">RFC7702</a>]</span>; group DMs are more
+like email.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="activitypub">
+<section id="section-4">
+      <h2 id="name-activitypub">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-activitypub" class="section-name selfRef">ActivityPub</a>
+      </h2>
+<p id="section-4-1">In this section, we provide a brief overview of the ActivityPub protocol.
+ActivityPub defines both client-to-server and server-to-server protocols.
+Because the MIMI transport layer only goes between two services, we focus on the
+server-to-server protocol.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">At a very high level, ActivityPub is similar to SMTP with JSON messages and
+delivery over HTTP.  An ActivityPub server forwards messages from local clients to
+their intended recipients, and receives messages from other servers intended for
+its local clients.  An ActivityPub server also makes available metadata that
+support the functioning of the protocol.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<div id="actors-and-activities">
+<section id="section-4.1">
+        <h3 id="name-actors-and-activities">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-actors-and-activities" class="section-name selfRef">Actors and Activities</a>
+        </h3>
+<p id="section-4.1-1">The main entities in ActivityPub are Actors and Activities.  In most cases, an
+Actor represents a user (<code>"type": "Person"</code>), but Actors can also represent
+automated services (<code>"type": "Service"</code>) or collections of other Actors
+(<code>"type": "Group"</code>).  Each Actor has a unique URI, from which a JSON-LD
+description of the Actor's attributes can be retrieved.  <a href="#fig-actor" class="auto internal xref">Figure 3</a> shows a
+simple Actor description.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">Activities represent a variety of actions within the system, including "Create"
+activities that carry new messages as well as things like "Add" and "Remove" to
+allow modifications of collections.  <a href="#fig-activity" class="auto internal xref">Figure 4</a> shows a Create activity
+that reflects the creation of a new Note object.  Activities can also carry
+metadata such as <code>inReplyTo</code> or <code>tags</code>.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<span id="name-a-sample-actor"></span><div id="fig-actor">
+<figure id="figure-3">
+          <div class="lang-json sourcecode" id="section-4.1-3.1">
+<pre>
+{
+  "@context": ["https://www.w3.org/ns/activitystreams"],
+  "type": "Person",
+  "id": "https://example.com/users/alice",
+  "inbox": "https://example.com/users/alice/inbox",
+  "outbox": "https://example.com/users/alice/feed"
+}
+</pre>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-a-sample-actor" class="selfRef">A sample Actor</a>
+          </figcaption></figure>
+</div>
+<span id="name-a-sample-activity"></span><div id="fig-activity">
+<figure id="figure-4">
+          <div class="lang-json sourcecode" id="section-4.1-4.1">
+<pre>
+{
+  "@context": "https://www.w3.org/ns/activitystreams",
+  "type": "Create",
+  "id": "https://example.net/~mallory/87374",
+  "actor": "https://example.net/~mallory",
+  "object": {
+    "id": "https://example.com/~mallory/note/72",
+    "type": "Note",
+    "attributedTo": "https://example.net/~mallory",
+    "content": "This is a note",
+    "published": "2015-02-10T15:04:55Z",
+    "to": ["https://example.org/~john/"],
+    "cc": ["https://example.com/~erik/followers"]
+  },
+  "published": "2015-02-10T15:04:55Z",
+  "to": ["https://example.org/~john/"],
+  "cc": ["https://example.com/~erik/followers"]
+}
+</pre>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-a-sample-activity" class="selfRef">A sample Activity</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+<div id="activity-delivery">
+<section id="section-4.2">
+        <h3 id="name-activity-delivery">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-activity-delivery" class="section-name selfRef">Activity Delivery</a>
+        </h3>
+<p id="section-4.2-1">Delivery of activities in ActivityPub follows a push pattern, with the ability
+to pull messages as a fallback.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">Each Actor has a "inbox" and "outbox" URIs, which allow external parties to
+deliver Activities to the Actor or read Activities that the Actor has posted,
+respectively.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">To send an Activity to the Actor, a remote server sends an HTTP POST request to
+the Actor's inbox URI. When a client of an ActivityPub server asks it to
+distribute an Activity, the server identifies the set of Actors that are the
+intended recipients of the Activity (e.g., using the <code>to</code> and <code>cc</code> fields
+visible in <a href="#fig-activity" class="auto internal xref">Figure 4</a>), and sends POSTs requests containing the activity
+to the Actors' inboxes.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-4">Outbox URIs allow a remote server to query the list of Activities that the Actor
+has posted. To read Activities posted by the actor, a remote party sednes an
+HTTP GET request to the outbox URL.  The outbox includes a paging function to
+allow traversal of large sets of Activities.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
+<p id="section-4.2-5">Both inbox and outbox requests are constrained by an authorization model, so
+that a server can constrain which Actors allowed to communicate.<a href="#section-4.2-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="identity">
+<section id="section-4.3">
+        <h3 id="name-identity">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-identity" class="section-name selfRef">Identity</a>
+        </h3>
+<p id="section-4.3-1">The native identifiers for ActivityPub are Actor URIs. These URIs are HTTP URIs
+that both identify end users as well as services and groups and allow the
+metadata for the Actor to be retrieved.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-2">HTTP URIs are of course not a very user-friendly identifier.  So many
+applications based on ActivityPub use identifiers of the form <code>@username@domain</code>
+or simply <code>@username</code> when the domain is clear from context. These identifiers
+represent <code>acct</code> URIs <span>[<a href="#RFC7565" class="cite xref">RFC7565</a>]</span>, which, in the words of the RFC, "identify a
+user's account at a service provider, irrespective of the particular protocols
+that can be used to interact with the account".<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.3-3">In order to engage in ActivityPub interactions with an Actor given such an
+identifier, the application resolves the identifier to an Actor URI using
+WebFinger <span>[<a href="#RFC7033" class="cite xref">RFC7033</a>]</span>. For example, given the URI <code>acct:alice@example.com</code>, the
+application would send a GET request to
+<code>https://example.com/.well-known/webfinger?resource=acct:alice@example.com</code>.
+The response would indicate various contact points associated with that account,
+as shown in <a href="#fig-webfinger" class="auto internal xref">Figure 5</a>.  The ActivityPub Actor URI is indicated by the
+<code>href</code> in the <code>links</code> entry with <code>"type": "application/activity+json"</code>.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+<span id="name-a-webfinger-response-for-ac"></span><div id="fig-webfinger">
+<figure id="figure-5">
+          <div class="lang-json sourcecode" id="section-4.3-4.1">
+<pre>
+{
+  "subject": "acct:alice@example.com",
+  "links": [
+    {
+      "rel": "http://webfinger.net/rel/profile-page",
+      "type": "text/html",
+      "href": "https://example.com/@alice"
+    },
+    {
+      "rel": "self",
+      "type": "application/activity+json",
+      "href": "https://example.com/users/alice"
+    }
+  ]
+}
+</pre>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-a-webfinger-response-for-ac" class="selfRef">A WebFinger response for `acct:alice@example.com`</a>
+          </figcaption></figure>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="using-activitypub-for-mimi">
+<section id="section-5">
+      <h2 id="name-using-activitypub-for-mimi">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-using-activitypub-for-mimi" class="section-name selfRef">Using ActivityPub for MIMI</a>
+      </h2>
+<p id="section-5-1">In this document, we consider the use of ActivityPub and related technologies
+for the transport and identity systems, and the integration of MLS for the E2E
+security layer <span>[<a href="#I-D.ietf-mls-protocol" class="cite xref">I-D.ietf-mls-protocol</a>]</span>.  Message formats are not handled
+here.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">Points at which ActivityPub would need to be extended are highlighted with
+<strong>[EXT]</strong>.  These are the domains where the MIMI working group would need to
+define protocol extensions to build an overall messaging systme based on
+ActivityPub.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<div id="user-identity-and-metadata">
+<section id="section-5.1">
+        <h3 id="name-user-identity-and-metadata">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-user-identity-and-metadata" class="section-name selfRef">User Identity and Metadata</a>
+        </h3>
+<p id="section-5.1-1">The primary identifier for a user is an <code>acct</code> URI, which is resolved to an
+Actor URI using WebFinger as described in <a href="#identity" class="auto internal xref">Section 4.3</a>.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">Aside from UI considerations, this choice of primary identifier is important for
+authentication at the end-to-end security layer.  An <code>acct</code> URI is a scoped
+identifier, in the sense that the domain is the authoritative source of
+information about what entity is represented by of the user portion of the URI.
+Indeed, this is the whole premise of using WebFinger for <code>acct</code> URI resolution.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-3"><strong>[EXT]</strong> To leverage this information in an MLS-based end-to-end security
+layer, all that is needed is a credential issued by the domain that attests that
+the holder of a given signature key legitimately represents the user portion of
+hte URI, for example an X.509 certificate or Verifiable Credential <span>[<a href="#RFC5280" class="cite xref">RFC5280</a>]</span>
+          <span>[<a href="#W3C.vc-data-model" class="cite xref">W3C.vc-data-model</a>]</span>.  MIMI would need to verify the format for such
+credentials and how a client receiving one would verify it, but would not need
+to specify an issuance API.  However, given that domains are already assumed to
+know how to authenticate their users, such an API could be as simple as a single
+authenticated POST request containing a proof of control of a key pair, whose
+response would then contain the desired credential.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-4">The ActivityPub Actor object contains optional fields that can provide
+additional metadata about a user, for example a profile URL or preferred
+username.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.1-5"><strong>[EXT]</strong> The Actor object would be a convenient mechanism to distribute the
+cryptographic material required to initiate end-to-end secure communications
+with an actor, i.e., KeyPackage objects in the case of MLS.  This facility would
+be slightly more complicated than the static metadata fields currently present.
+KeyPackages are intended to be single-use, so the server managing the Actor
+object would need to selectively provide different KeyPackages in response to
+differnet queries.  Multi-device scenarios might require multiple KeyPackages to
+be provided in response to a single query.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="channels">
+<section id="section-5.2">
+        <h3 id="name-channels">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-channels" class="section-name selfRef">Channels</a>
+        </h3>
+<p id="section-5.2-1">The channel use case can be implemented by representing the channel as an
+ActivityPub Actor.  Metadata related to the channel can be published and managed
+as part of the Actor object.  In particular, the <code>followers</code> collection for the
+Actor can be used to track the membership of the channel, so that normal
+ActivityPub patterns can be followed for message delivery and membership
+management.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2"><strong>[EXT]</strong> A channel's Actor also tracks information about the end-to-end
+security state of the channel.  For MLS, this would entail tracking information
+about an MLS group associated to the channel, most importantly the current epoch
+and ratchet tree.  A channel may also need to store a GroupInfo object for the
+group, as discussed in <a href="#membership-and-metadata-management" class="auto internal xref">Section 5.2.3</a>.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-3">In the context of federated messaging, the question of which server hosts a
+channel could be contentious.  For example, if Alice creates a channel on
+Service A and invites Bob and Charlie from Services B and C, but then Alice
+leaves the channel, does Service A continue to host the channel even though none
+of their users are involved?  If this is a problem the working group needs to
+tackle, it will likely be useful to follow the approaches used in Mastodon for
+moving or linking accounts, e.g., using a <code>Move</code> activity.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<div id="channel-creation">
+<section id="section-5.2.1">
+          <h4 id="name-channel-creation">
+<a href="#section-5.2.1" class="section-number selfRef">5.2.1. </a><a href="#name-channel-creation" class="section-name selfRef">Channel Creation</a>
+          </h4>
+<p id="section-5.2.1-1">When a channel is created on a service's server by a user of that server, no
+MIMI/ActivityPub action is needed.  The server hosting the channel can notify
+the members of the channel that it has been created by sending a <code>Create</code>
+activity to their inboxes.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
+<span id="name-a-create-activity-announcin"></span><div id="fig-create">
+<figure id="figure-6">
+            <div class="lang-json sourcecode" id="section-5.2.1-2.1">
+<pre>
+{
+  "@context": [
+    "https://www.w3.org/ns/activitystreams",
+    "urn:ietf:ns:mimi",
+  ],
+  "summary": "Alice created a channel",
+  "type": "Create",
+  "id": "http://example.com/activities/1",
+  "actor": "http://example.com/user/alice",
+  "object": {
+    "type": "Service",
+    "id": "http://example.com/channels/e4f70622",
+    "name": "MIMI discussion group"
+  },
+  "mimi:welcome": "&lt;base64-encoded Welcome&gt;",
+  "to": "http://john.example.org"
+}
+</pre>
+</div>
+<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
+<a href="#name-a-create-activity-announcin" class="selfRef">A Create activity announcing a new channel</a>
+            </figcaption></figure>
+</div>
+<p id="section-5.2.1-3"><strong>[EXT]</strong> To set up the end-to-end security for the channel, the creator of the
+channel will need to fetch KeyPackages for the other members of the channel.
+For members using other services, KeyPackages can be fetched via the members'
+Actor objects, as discussed in <a href="#user-identity-and-metadata" class="auto internal xref">Section 5.1</a>.  An MLS Welcome
+message enabling the members to initialize their MLS state is attached to the
+<code>Create</code> activity.<a href="#section-5.2.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="message-delivery">
+<section id="section-5.2.2">
+          <h4 id="name-message-delivery">
+<a href="#section-5.2.2" class="section-number selfRef">5.2.2. </a><a href="#name-message-delivery" class="section-name selfRef">Message Delivery</a>
+          </h4>
+<p id="section-5.2.2-1">Messages are sent within a channel by sending a <code>Create</code> activity to the channel
+Actor's inbox, addressed to the channel's followers.  Following the "Forwarding
+from inbox" pattern discussed in <span>[<a href="#W3C.ActivityPub" class="cite xref">W3C.ActivityPub</a>]</span>, the server hosting the
+channel will then forward the activity to inboxes of the members of the channel.
+The message content itself is an MLS PrivateMessage encapsulating the actual
+content to be delivered to the channel.<a href="#section-5.2.2-1" class="pilcrow">¶</a></p>
+<span id="name-a-create-activity-sending-a"></span><figure id="figure-7">
+            <div class="lang-json sourcecode" id="section-5.2.2-2.1">
+<pre>
+{
+  "@context": "https://www.w3.org/ns/activitystreams",
+  "type": "Create",
+  "id": "https://example.net/~mallory/87374",
+  "actor": "https://example.net/~mallory",
+  "object": {
+    "id": "https://example.com/~mallory/note/72",
+    "type": "Note",
+    "attributedTo": "https://example.net/~mallory",
+    "content": "&lt;base64 encoded MLS PrivateMessage&gt;",
+    "published": "2015-02-10T15:04:55Z",
+    "to": ["http://example.com/channels/e4f70622/followers"]
+  },
+  "published": "2015-02-10T15:04:55Z",
+  "to": ["http://example.com/channels/e4f70622/followers"]
+}
+</pre>
+</div>
+<figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
+<a href="#name-a-create-activity-sending-a" class="selfRef">A Create activity sending a message to a channel</a>
+            </figcaption></figure>
+<p id="section-5.2.2-3">If the members have a <code>sharedInbox</code> field in their Actor objects, this delivery
+can be quite efficient at the inter-service level: Only one copy of the activity
+will be sent to each shared inbox, effectively once per service involved in the
+channel.<a href="#section-5.2.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="membership-and-metadata-management">
+<section id="section-5.2.3">
+          <h4 id="name-membership-and-metadata-man">
+<a href="#section-5.2.3" class="section-number selfRef">5.2.3. </a><a href="#name-membership-and-metadata-man" class="section-name selfRef">Membership and Metadata Management</a>
+          </h4>
+<p id="section-5.2.3-1">Members of the channel add and remove other members by using <code>Add</code> and <code>Remove</code>
+activities to propose modifications to the followers collection associated to
+the channel's Actor.  <code>Add</code> activities should be forward to the new member to
+make them aware of their membership in the channel.<a href="#section-5.2.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.2.3-2"><strong>[EXT]</strong> An <code>Add</code> or <code>Remove</code> activity must include an MLS Commit that
+implements the  corresponding action on the MLS group.  The Commit message must
+be sent as a PublicMessage so that the server can update its representation of
+the group's ratchet tree based on the content of the Commit.  An <code>Add</code> activity
+must also include an MLS Welcome message allowing the new member to initialize
+their MLS state.  Before accepting an <code>Add</code> or <code>Remove</code> activity for a channel,
+the server must verify that the attached Commit corresponds to the current MLS
+epoch for the channel, and reject the activity if this is not the case.<a href="#section-5.2.3-2" class="pilcrow">¶</a></p>
+<span id="name-an-add-activity-adding-a-ne"></span><figure id="figure-8">
+            <div class="lang-json sourcecode" id="section-5.2.3-3.1">
+<pre>
+{
+  "@context": "https://www.w3.org/ns/activitystreams",
+  "type": "Add",
+  "id": "https://example.com/user/alice/98485",
+  "actor": "http://example.com/user/alice",
+  "object": "http://example.net/user/bob",
+  "target": "http://example.com/channels/e4f70622/followers",
+  "commit": "&lt;base64-encoded MLS Commit&gt;",
+  "welcome": "&lt;base64-encoded MLS Welcome&gt;",
+  "to": ["http://example.com/channels/e4f70622/followers"]
+}
+</pre>
+</div>
+<figcaption><a href="#figure-8" class="selfRef">Figure 8</a>:
+<a href="#name-an-add-activity-adding-a-ne" class="selfRef">An Add activity adding a new member to a channel</a>
+            </figcaption></figure>
+<p id="section-5.2.3-4">Other channel metadata (e.g., the name of the channel) can be updated by sending
+an Update activity to the channel Actor's inbox.<a href="#section-5.2.3-4" class="pilcrow">¶</a></p>
+<div id="fig-update">
+<figure id="figure-9">
+            <div class="lang-json sourcecode" id="section-5.2.3-5.1">
+<pre>
+{
+  "@context": "https://www.w3.org/ns/activitystreams",
+  "type": "Update",
+  "actor": "http://example.com/user/alice",
+  "object": "object": {
+    "type": "Service",
+    "id": "http://example.com/channels/e4f70622",
+    "name": "MIMI discussion group (now with more ActivityPub!)"
+  },
+  "to": "http://example.com/channels/e4f70622/inbox"
+}
+</pre>
+</div>
+<figcaption><a href="#figure-9" class="selfRef">Figure 9</a></figcaption></figure>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="group-dms">
+<section id="section-5.3">
+        <h3 id="name-group-dms">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-group-dms" class="section-name selfRef">Group DMs</a>
+        </h3>
+<p id="section-5.3-1">In principle, since group DMs don't have any independent state aside from the
+recipient list, groupDMs could be implemented directly using ActivityPub's
+addressing model.  Activities could be directly addressed to other
+actors using the <code>to</code> field, and a service receiving an activity could
+associate it to a group DM based on the recipient list in the <code>to</code> field.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-2">This approach would simplify certain things. For example, if a group DM used an
+Actor for distribution as with a channel, it would be necessary to explicitly
+enforce that there was only one such Actor per group DM; with direct
+addresising, no such common resources are created, so there is no need to ensure
+their uniqueness.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.3-3">Such a decentralized approach, however, does not work well with MLS, which works
+best with a central coordination point to manage the sequencing of changes to
+MLS state.  There are a couple of compromise options available here.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
+<p id="section-5.3-4">It might be feasible have the MLS groups attached to group DMs be immutable.
+The first person to send a message in a group DM would include a Welcome
+addressed to KeyPackages for all the other recipients.  That message would
+initialize an MLS group including all the other recipients, which would be used
+to protect further messages.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
+<p id="section-5.3-5">While the immutability approach is appealing in its simplicity, it might not be
+workable.  Participants in the group DM might want to update their keys for
+post-compromise security, or they might want to add a new device that they start
+using after the group DM starts.  Both of these operations require changes to
+the MLS group.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
+<p id="section-5.3-6">To allow mutable MLS groups, group DMs could use direct addressing for message
+delivery, but link to an MLS group managed more like the MLS group attached to a
+channel.<a href="#section-5.3-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-6">
+      <h2 id="name-security-considerations">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-6-1">ActivityPub uses HTTPS for transport security on server-to-server interactions.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<div id="end-to-end-security">
+<section id="section-6.1">
+        <h3 id="name-end-to-end-security">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-end-to-end-security" class="section-name selfRef">End-to-End Security</a>
+        </h3>
+<p id="section-6.1-1"><a href="#using-activitypub-for-mimi" class="auto internal xref">Section 5</a> includes provisions for implementing an end-to-end
+security layer based on MLS.  As described in <span>[<a href="#I-D.ietf-mls-protocol" class="cite xref">I-D.ietf-mls-protocol</a>]</span>, MLS
+requires a Delivery Service (DS) and an Authentication Service (AS) in order to
+be integrated into an application.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">Here, the DS functions are provided in a decentralized fashion by the
+ActivityPub servers representing the interoperating services.  KeyPackages are
+distributed via users' Actor objects (see
+<a href="#user-identity-and-metadata" class="auto internal xref">Section 5.1</a>).  Other MLS messages are distributed as part of
+membership management activities (see <a href="#membership-and-metadata-management" class="auto internal xref">Section 5.2.3</a>).<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">The AS function is provided by the service-issued credentials discussed in
+<a href="#user-identity-and-metadata" class="auto internal xref">Section 5.1</a>.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="forward-secrecy">
+<section id="section-6.2">
+        <h3 id="name-forward-secrecy">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-forward-secrecy" class="section-name selfRef">Forward Secrecy</a>
+        </h3>
+<p id="section-6.2-1">By default, MLS provides forward secrecy and post-compromise security for
+messages sent within a group.  In the most straightforward application of MLS to
+messaging, this means that a new member of a channel will not be able to decrypt
+messages from before they joined the group.  If providing access to historical
+messages is a desired feature, than further mechanism will be required to
+provide new members access to historical keys.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authentication-and-authorization">
+<section id="section-6.3">
+        <h3 id="name-authentication-and-authoriz">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-authentication-and-authoriz" class="section-name selfRef">Authentication and Authorization</a>
+        </h3>
+<p id="section-6.3-1">There are some open questions here related to authentication and authorization,
+for example:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.3-2.1">How should servers authenticate each other?<a href="#section-6.3-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-6.3-2.2">How a receiving server knows that an Activity authentically comes from the
+Actor who is supposed to have sent it?<a href="#section-6.3-2.2" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-6.3-2.3">What access control policies can a server enforce on inbound messages?<a href="#section-6.3-2.3" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-6.3-3">The ActivityPub specification is very light on details on these topics. However,
+applications such as Mastodon have likely developed solutions that could be used
+as starting points.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-7">
+      <h2 id="name-iana-considerations">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-7-1">This document has no IANA actions.<a href="#section-7-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<section id="section-8">
+      <h2 id="name-references">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<section id="section-8.1">
+        <h3 id="name-normative-references">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="I-D.ietf-mls-protocol">[I-D.ietf-mls-protocol]</dt>
+        <dd>
+<span class="refAuthor">Barnes, R.</span>, <span class="refAuthor">Beurdouche, B.</span>, <span class="refAuthor">Robert, R.</span>, <span class="refAuthor">Millican, J.</span>, <span class="refAuthor">Omara, E.</span>, and <span class="refAuthor">K. Cohn-Gordon</span>, <span class="refTitle">"The Messaging Layer Security (MLS) Protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-mls-protocol-18</span>, <time datetime="2023-03-13" class="refDate">13 March 2023</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-mls-protocol-18">https://datatracker.ietf.org/doc/html/draft-ietf-mls-protocol-18</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7033">[RFC7033]</dt>
+        <dd>
+<span class="refAuthor">Jones, P.</span>, <span class="refAuthor">Salgueiro, G.</span>, <span class="refAuthor">Jones, M.</span>, and <span class="refAuthor">J. Smarr</span>, <span class="refTitle">"WebFinger"</span>, <span class="seriesInfo">RFC 7033</span>, <span class="seriesInfo">DOI 10.17487/RFC7033</span>, <time datetime="2013-09" class="refDate">September 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7033">https://www.rfc-editor.org/rfc/rfc7033</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7565">[RFC7565]</dt>
+        <dd>
+<span class="refAuthor">Saint-Andre, P.</span>, <span class="refTitle">"The 'acct' URI Scheme"</span>, <span class="seriesInfo">RFC 7565</span>, <span class="seriesInfo">DOI 10.17487/RFC7565</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7565">https://www.rfc-editor.org/rfc/rfc7565</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="W3C.ActivityPub">[W3C.ActivityPub]</dt>
+      <dd>
+<span class="refTitle">"ActivityPub"</span>, <span class="seriesInfo">W3C REC activitypub</span>, <span class="seriesInfo">W3C activitypub</span>, <span>&lt;<a href="https://www.w3.org/TR/activitypub/">https://www.w3.org/TR/activitypub/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+<section id="section-8.2">
+        <h3 id="name-informative-references">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="Mastodon">[Mastodon]</dt>
+        <dd>
+<span class="refTitle">"Mastodon"</span>, <span>n.d.</span>, <span>&lt;<a href="https://docs.joinmastodon.org/spec/activitypub/">https://docs.joinmastodon.org/spec/activitypub/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5280">[RFC5280]</dt>
+        <dd>
+<span class="refAuthor">Cooper, D.</span>, <span class="refAuthor">Santesson, S.</span>, <span class="refAuthor">Farrell, S.</span>, <span class="refAuthor">Boeyen, S.</span>, <span class="refAuthor">Housley, R.</span>, and <span class="refAuthor">W. Polk</span>, <span class="refTitle">"Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile"</span>, <span class="seriesInfo">RFC 5280</span>, <span class="seriesInfo">DOI 10.17487/RFC5280</span>, <time datetime="2008-05" class="refDate">May 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5280">https://www.rfc-editor.org/rfc/rfc5280</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC561">[RFC561]</dt>
+        <dd>
+<span class="refAuthor">Bhushan, A.</span>, <span class="refAuthor">Pogran, K.</span>, <span class="refAuthor">Tomlinson, R.</span>, and <span class="refAuthor">J. White</span>, <span class="refTitle">"Standardizing Network Mail Headers"</span>, <span class="seriesInfo">RFC 561</span>, <span class="seriesInfo">DOI 10.17487/RFC0561</span>, <time datetime="1973-09" class="refDate">September 1973</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc561">https://www.rfc-editor.org/rfc/rfc561</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6120">[RFC6120]</dt>
+        <dd>
+<span class="refAuthor">Saint-Andre, P.</span>, <span class="refTitle">"Extensible Messaging and Presence Protocol (XMPP): Core"</span>, <span class="seriesInfo">RFC 6120</span>, <span class="seriesInfo">DOI 10.17487/RFC6120</span>, <time datetime="2011-03" class="refDate">March 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6120">https://www.rfc-editor.org/rfc/rfc6120</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7702">[RFC7702]</dt>
+        <dd>
+<span class="refAuthor">Saint-Andre, P.</span>, <span class="refAuthor">Ibarra, S.</span>, and <span class="refAuthor">S. Loreto</span>, <span class="refTitle">"Interworking between the Session Initiation Protocol (SIP) and the Extensible Messaging and Presence Protocol (XMPP): Groupchat"</span>, <span class="seriesInfo">RFC 7702</span>, <span class="seriesInfo">DOI 10.17487/RFC7702</span>, <time datetime="2015-12" class="refDate">December 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7702">https://www.rfc-editor.org/rfc/rfc7702</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="W3C.vc-data-model">[W3C.vc-data-model]</dt>
+      <dd>
+<span class="refTitle">"Verifiable Credentials Data Model v1.1"</span>, <span class="seriesInfo">W3C REC vc-data-model</span>, <span class="seriesInfo">W3C vc-data-model</span>, <span>&lt;<a href="https://www.w3.org/TR/vc-data-model/">https://www.w3.org/TR/vc-data-model/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</section>
+<div id="acknowledgments">
+<section id="appendix-A">
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="appendix-A-1">This investigation was inspired by a <a href="https://friend.camp/@darius/109996157569528129">Mastodon post by Darius
+Kazemi</a>.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-B">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Richard L. Barnes</span></div>
+<div dir="auto" class="left"><span class="org">Cisco</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:rlb@ipv.sx" class="email">rlb@ipv.sx</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
