@@ -535,7 +535,7 @@ This approach would simplify certain things. For example, if a group DM used an
 Actor for distribution as with a channel, it would be necessary to explicitly
 enforce that there was only one such Actor per group DM; with direct
 addresising, no such common resources are created, so there is no need to ensure
-their uniqueness.  
+their uniqueness.
 
 Such a decentralized approach, however, does not work well with MLS, which works
 best with a central coordination point to manage the sequencing of changes to
