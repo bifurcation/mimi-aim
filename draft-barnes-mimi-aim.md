@@ -1,6 +1,6 @@
 ---
-title: "ActivityPub for Interoperable Messaging (AIM)"
-abbrev: "AIM"
+title: "ActivityPub for Interoperable Messaging"
+abbrev: "MIMI ActivityPub"
 category: info
 
 docname: draft-barnes-mimi-aim-latest
