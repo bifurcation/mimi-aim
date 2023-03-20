@@ -321,7 +321,7 @@ as shown in {{fig-webfinger}}.  The ActivityPub Actor URI is indicated by the
   "subject": "acct:alice@example.com",
   "links": [
     {
-      "rel": "http://webfinger.net/rel/profile-page",
+      "rel": "https://webfinger.net/rel/profile-page",
       "type": "text/html",
       "href": "https://example.com/@alice"
     },
@@ -416,19 +416,19 @@ activity to their inboxes.
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "urn:ietf:ns:mimi",
+    "urn:ietf:ns:mimi"
   ],
   "summary": "Alice created a channel",
   "type": "Create",
-  "id": "http://example.com/activities/1",
-  "actor": "http://example.com/user/alice",
+  "id": "https://example.com/activities/1",
+  "actor": "https://example.com/user/alice",
   "object": {
     "type": "Service",
-    "id": "http://example.com/channels/e4f70622",
+    "id": "https://example.com/channels/e4f70622",
     "name": "MIMI discussion group"
   },
   "mimi:welcome": "<base64-encoded Welcome>",
-  "to": "http://john.example.org"
+  "to": "https://john.example.org"
 }
 ~~~
 {: #fig-create title="A Create activity announcing a new channel" }
@@ -461,10 +461,10 @@ content to be delivered to the channel.
     "attributedTo": "https://example.net/~mallory",
     "content": "<base64 encoded MLS PrivateMessage>",
     "published": "2015-02-10T15:04:55Z",
-    "to": ["http://example.com/channels/e4f70622/followers"]
+    "to": ["https://example.com/channels/e4f70622/followers"]
   },
   "published": "2015-02-10T15:04:55Z",
-  "to": ["http://example.com/channels/e4f70622/followers"]
+  "to": ["https://example.com/channels/e4f70622/followers"]
 }
 ~~~
 {: fig-message title="A Create activity sending a message to a channel" }
@@ -495,12 +495,12 @@ epoch for the channel, and reject the activity if this is not the case.
   "@context": "https://www.w3.org/ns/activitystreams",
   "type": "Add",
   "id": "https://example.com/user/alice/98485",
-  "actor": "http://example.com/user/alice",
-  "object": "http://example.net/user/bob",
-  "target": "http://example.com/channels/e4f70622/followers",
+  "actor": "https://example.com/user/alice",
+  "object": "https://example.net/user/bob",
+  "target": "https://example.com/channels/e4f70622/followers",
   "commit": "<base64-encoded MLS Commit>",
   "welcome": "<base64-encoded MLS Welcome>",
-  "to": ["http://example.com/channels/e4f70622/followers"]
+  "to": ["https://example.com/channels/e4f70622/followers"]
 }
 ~~~
 {: fig-add title="An Add activity adding a new member to a channel" }
@@ -512,13 +512,13 @@ an Update activity to the channel Actor's inbox.
 {
   "@context": "https://www.w3.org/ns/activitystreams",
   "type": "Update",
-  "actor": "http://example.com/user/alice",
-  "object": "object": {
+  "actor": "https://example.com/user/alice",
+  "object": {
     "type": "Service",
-    "id": "http://example.com/channels/e4f70622",
+    "id": "https://example.com/channels/e4f70622",
     "name": "MIMI discussion group (now with more ActivityPub!)"
   },
-  "to": "http://example.com/channels/e4f70622/inbox"
+  "to": "https://example.com/channels/e4f70622/inbox"
 }
 ~~~
 {: #fig-update title"An Update activity changing the name of the channel" }
