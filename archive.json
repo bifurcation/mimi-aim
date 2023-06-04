@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2023-06-01T00:09:28.129041+00:00",
+  "timestamp": "2023-06-04T00:08:32.462479+00:00",
   "repo": "bifurcation/mimi-aim",
   "labels": [
     {
@@ -49,6 +49,23 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOJLUsJ85ncjYS",
+      "title": "Actor not \"End\" for end to end messaging",
+      "url": "https://github.com/bifurcation/mimi-aim/issues/1",
+      "state": "OPEN",
+      "author": "HelgeKrueger",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "I hope this is a good place to leave feedback.\r\n\r\nRegarding the phrasing:\r\n\r\n>  The Actor object would be a convenient mechanism to distribute the cryptographic material required to initiate end-to-end secure communications __with an actor__, i.e., KeyPackage objects in the case of MLS. \r\n\r\nIn the Fediverse an user can connect to their actor using multiple devices (= ends), e.g. webbrowser / phone, and the actor is stored on the server. It would be good to clarify that the application on the phone is to be considered an end. Furthermore, this means that the actor should distribute a KeyPackage for each such device. This means that the actor as in the proxy for the user on the ActivityPub Server should not be able to decrypt the E2EE message.\r\n\r\nThis assumes that that I understand correctly that a KeyPackage contains a single set of cryptographic material.\r\n\r\nI'm keeping track of Fediverse E2EE related issues in fediverse-ideas, see https://codeberg.org/fediverse/fediverse-ideas/issues/3",
+      "createdAt": "2023-06-01T06:03:07Z",
+      "updatedAt": "2023-06-01T06:03:07Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": []
 }
